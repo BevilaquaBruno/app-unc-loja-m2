@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "516458742072",
+    "project_id": "lojam2-7f994",
+    "storage_bucket": "lojam2-7f994.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:516458742072:android:541a1c3a4ff799bebc01cd",
+        "android_client_info": {
+          "package_name": "com.bevilaqua.aplicativo_unc_m2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDPaDXoOrdp3iqq_Z1n1vBW8s6kJXs5YQs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
