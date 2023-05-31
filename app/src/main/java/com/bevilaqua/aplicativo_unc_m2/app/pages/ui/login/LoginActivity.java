@@ -1,6 +1,7 @@
 package com.bevilaqua.aplicativo_unc_m2.app.pages.ui.login;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -20,7 +21,10 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.bevilaqua.aplicativo_unc_m2.R;
+import com.bevilaqua.aplicativo_unc_m2.app.pages.ListProductsActivity;
 import com.bevilaqua.aplicativo_unc_m2.databinding.ActivityLoginBinding;
+
+import java.util.concurrent.TimeUnit;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -51,11 +55,15 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
                 loginButton.setEnabled(loginFormState.isDataValid());
+                registerButton.setEnabled(loginFormState.isDataValid());
                 if (loginFormState.getEmailError() != null) {
                     emailEditText.setError(getString(loginFormState.getEmailError()));
                 }
                 if (loginFormState.getPasswordError() != null) {
                     passwordEditText.setError(getString(loginFormState.getPasswordError()));
+                }
+                if (loginFormState.getNameError() != null) {
+                    nameEditText.setError(getString(loginFormState.getNameError()));
                 }
             }
         });
@@ -99,17 +107,7 @@ public class LoginActivity extends AppCompatActivity {
         };
         emailEditText.addTextChangedListener(afterTextChangedListener);
         passwordEditText.addTextChangedListener(afterTextChangedListener);
-        passwordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    loginViewModel.login(emailEditText.getText().toString(),
-                            passwordEditText.getText().toString());
-                }
-                return false;
-            }
-        });
+        nameEditText.addTextChangedListener(afterTextChangedListener);
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,12 +117,27 @@ public class LoginActivity extends AppCompatActivity {
                         passwordEditText.getText().toString());
             }
         });
+
+        registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View y) {
+                loadingProgressBar.setVisibility(View.VISIBLE);
+                loginViewModel.register(emailEditText.getText().toString(),
+                        passwordEditText.getText().toString(), nameEditText.getText().toString());
+                try {
+                    TimeUnit.SECONDS.sleep(2);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                loginViewModel.insertCurrenUser();
+            }
+        });
     }
 
     private void updateUiWithUser(LoggedInUserView model) {
         String welcome = getString(R.string.welcome) + model.getDisplayName();
-        // TODO : initiate successful logged in experience
         Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
+        startActivity(new Intent(this, ListProductsActivity.class));
     }
 
     private void showLoginFailed(@StringRes Integer errorString) {

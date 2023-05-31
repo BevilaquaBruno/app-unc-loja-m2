@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.bevilaqua.aplicativo_unc_m2.app.pages.ListProductsActivity;
+import com.bevilaqua.aplicativo_unc_m2.app.pages.ui.login.LoginActivity;
 import com.bevilaqua.aplicativo_unc_m2.data.sources.local.ConfigFirebase;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -20,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser user = auth.getCurrentUser();
 
         if (user == null){
-            setContentView(R.layout.activity_main);
+            startActivity(new Intent(this, LoginActivity.class));
         }else{
             startActivity(new Intent(this, ListProductsActivity.class));
         }

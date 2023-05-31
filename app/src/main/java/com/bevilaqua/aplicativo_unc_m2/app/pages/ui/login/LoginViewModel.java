@@ -67,6 +67,17 @@ public class LoginViewModel extends ViewModel {
         }
     }
 
+    public void insertCurrenUser() {
+        Result<UserModel> result = loginRepository.insertLoggedUser();
+
+        if (result instanceof Result.Success) {
+            UserModel data = ((Result.Success<UserModel>) result).getData();
+            loginResult.setValue(new LoginResult(new LoggedInUserView(data)));
+        } else {
+            loginResult.setValue(new LoginResult(R.string.login_failed));
+        }
+    }
+
     public void loginDataChanged(String email, String password, String name) {
         if (!isEmailValid(email)) {
             loginFormState.setValue(new LoginFormState(R.string.invalid_email, null, null));

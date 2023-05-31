@@ -64,4 +64,13 @@ public class LoginRepository {
         }
         return result;
     }
+
+    public Result<UserModel> insertLoggedUser() {
+        // handle login
+        Result<UserModel> result = dataSource.insertCurrentUser();
+        if (result instanceof Result.Success) {
+            setUserModel(((Result.Success<UserModel>) result).getData());
+        }
+        return result;
+    }
 }

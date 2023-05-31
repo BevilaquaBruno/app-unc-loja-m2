@@ -50,7 +50,7 @@
         android:hint="@string/prompt_name"
         android:imeActionLabel="@string/action_sign_in"
         android:imeOptions="actionDone"
-        android:inputType="textPassword"
+        android:inputType="text"
         android:minHeight="48dp"
         android:selectAllOnFocus="true"
         app:layout_constraintEnd_toEndOf="parent"

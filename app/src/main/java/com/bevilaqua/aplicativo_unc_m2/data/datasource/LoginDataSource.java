@@ -9,6 +9,7 @@ import com.bevilaqua.aplicativo_unc_m2.data.sources.local.ConfigFirebase;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.auth.User;
 
 import java.io.IOException;
 import java.util.Map;
@@ -52,33 +53,41 @@ public class LoginDataSource {
         try {
             String email = (String) json.get("email");
             String password = (String) json.get("password");
+            String name = (String) json.get("name");
 
             auth = ConfigFirebase.getAuth();
-            assert email != null && password != null;
+            assert email != null && password != null && name != null;
 
             auth.createUserWithEmailAndPassword(email, password)
                     .addOnSuccessListener(task -> {
                         Log.d("SIGNUPSUCCESS", "createUserWithEmail:success");
-                        /*Objects.requireNonNull(Objects.requireNonNull(task.getUser()).updateProfile(
+                        Objects.requireNonNull(Objects.requireNonNull(task.getUser()).updateProfile(
                                 new UserProfileChangeRequest.Builder().setDisplayName(
                                         name
                                 ).build()
-                        ));*/
+                        ));
                     }).addOnFailureListener(task -> {
                         Log.w("SIGNUPFAILURE", "createUserWithEmail:failure", task.getCause());
                     });
-            UserModel userModel =
-                    new UserModel(Objects.requireNonNull(auth.getCurrentUser().getUid()),
-                            auth.getCurrentUser().getDisplayName(),
-                            auth.getCurrentUser().getEmail()
-                    );
-
-            FirebaseFirestore db = ConfigFirebase.getDb();
-            db.collection("users").add(userModel.toJson());
-            return new Result.Success<>(userModel);
+            return new Result.Success<>(new UserModel("", email, name));
         } catch (Exception e) {
-            Log.e("Error => ", e.getMessage());
+            Log.e("Error => ", (e.getMessage() != null? e.getMessage() : "Error"));
             return new Result.Error(new IOException("Error logging in", e));
+        }
+    }
+
+    public Result<UserModel> insertCurrentUser() {
+
+        try {
+            FirebaseFirestore db = ConfigFirebase.getDb();
+            FirebaseAuth firebaseAuth = ConfigFirebase.getAuth();
+            UserModel userModel = new UserModel(firebaseAuth.getCurrentUser().getUid(),
+                    firebaseAuth.getCurrentUser().getEmail(), firebaseAuth.getCurrentUser().getDisplayName());
+            db.collection("users").add(userModel.toJson());
+
+            return new Result.Success<>(userModel);
+        }catch(Exception e){
+            return new Result.Error(new IOException("Error inserting", e));
         }
     }
 
