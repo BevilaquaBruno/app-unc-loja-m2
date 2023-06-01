@@ -13,4 +13,10 @@
     <string name="invalid_password">Senha deve ter mais de 5 caracteres</string>
     <string name="invalid_name">Nome inválido</string>
     <string name="login_failed">"Login failed"</string>
+
+    <!-- Product List -->
+    <string name="speakable_add_product">Adicionar produto</string>
+
+    <!-- Form product -->
+    <string name="app_bar_name">Cadastro de produto</string>
 </resources>
