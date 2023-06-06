@@ -14,6 +14,8 @@ import android.view.View;
 import com.bevilaqua.aplicativo_unc_m2.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.Map;
+
 public class ListProductsActivity extends AppCompatActivity {
 
     @Override
@@ -26,7 +28,7 @@ public class ListProductsActivity extends AppCompatActivity {
         btnAddProduct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openFormProdutc();
+                openFormProduct("Create");
             }
         });
     }
@@ -44,8 +46,17 @@ public class ListProductsActivity extends AppCompatActivity {
                 }
             });
 
-    public void openFormProdutc() {
+    public void openFormProduct(String action) {
         Intent intent = new Intent(this, FormProductActivity.class);
+        intent.putExtra("action", action);
+        intent.putExtra("id", "");
+        intent.putExtra("title", "Título");
+        intent.putExtra("description", "Descrição");
+        intent.putExtra("created_at", "");
+        intent.putExtra("updated_at", "");
+        intent.putExtra("stocked", false);
+        intent.putExtra("value", 0.00);
+
         someActivityResultLauncher.launch(intent);
     }
 
