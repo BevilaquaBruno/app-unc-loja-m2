@@ -10,10 +10,21 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bevilaqua.aplicativo_unc_m2.R;
+import com.bevilaqua.aplicativo_unc_m2.data.Result;
+import com.bevilaqua.aplicativo_unc_m2.data.datasource.ProductDataSource;
+import com.bevilaqua.aplicativo_unc_m2.data.repository.ProductRepository;
+import com.bevilaqua.aplicativo_unc_m2.data.sources.local.ConfigFirebase;
+import com.bevilaqua.aplicativo_unc_m2.domain.entity.ProductEntity;
+import com.google.firebase.auth.FirebaseAuth;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Objects;
+import java.util.UUID;
 
 public class FormProductActivity extends AppCompatActivity {
 
@@ -70,6 +81,40 @@ public class FormProductActivity extends AppCompatActivity {
     }
 
     private void saveProduct() {
+        try {
+            FirebaseAuth auth = ConfigFirebase.getAuth();
+            JSONObject json = new JSONObject();
+            json.put("user_id", Objects.requireNonNull(auth.getCurrentUser()).getUid());
+            json.put("id",  UUID.randomUUID().toString());
+            json.put("title", edtTextTitle.getText().toString());
+            json.put("description", edtTextDescription.getText().toString());
+            json.put("created_at", edtTextCreatedAt.getText().toString());
+            json.put("updated_at", edtTextUpdatedAt.getText().toString());
+            json.put("stocked", switchStocked.isChecked());
+            json.put("value", Double.parseDouble(edtTextValue.getText().toString()));
+            ProductEntity product = new ProductEntity(json);
+
+            ProductRepository repository = new ProductRepository(new ProductDataSource());
+            Boolean situation = null;
+            if(Objects.equals(this.action, "Create")){
+                situation = ((Result.Success<Boolean>) repository.saveProduct(product)).getData();
+                Log.i("Create", situation.toString());
+            }else if(Objects.equals(this.action, "Edit")) {
+                situation = ((Result.Success<Boolean>) repository.updateProduct(product)).getData();
+                Log.i("Edit", situation.toString());
+            }
+
+            if (situation.equals(true)){
+                Toast.makeText(this, (this.action.equals("Create") ? "Serviço cadastrado com sucesso" : "Serviço editado com sucesso"), Toast.LENGTH_LONG).show();
+                finish();
+            }else{
+                Toast.makeText(this, (this.action.equals("Create") ? "Erro ao cadastrar o serviço" : "Erro ao editar o serviço"), Toast.LENGTH_LONG).show();
+            }
+
+        } catch (JSONException e) {
+            Log.i("DataSource Error", e.getMessage());
+            e.printStackTrace();
+        }
         Log.i("Title => ", edtTextTitle.getText().toString());
         Log.i("Description => ", edtTextDescription.getText().toString());
         Log.i("createdAt => ", edtTextCreatedAt.getText().toString());
