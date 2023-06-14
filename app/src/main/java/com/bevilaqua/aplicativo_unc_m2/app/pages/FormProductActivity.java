@@ -3,6 +3,7 @@ package com.bevilaqua.aplicativo_unc_m2.app.pages;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -38,6 +39,7 @@ public class FormProductActivity extends AppCompatActivity {
     private Double value;
 
     TextView txTitle;
+    TextView txViewId;
     EditText edtTextTitle;
     EditText edtTextDescription;
     EditText edtTextCreatedAt;
@@ -66,13 +68,15 @@ public class FormProductActivity extends AppCompatActivity {
         this.edtTextUpdatedAt = findViewById(R.id.edtTextUpdatedAt);
         this.switchStocked = findViewById(R.id.switchStocked);
         this.edtTextValue = findViewById(R.id.edtTextValue);
+        this.txViewId = findViewById(R.id.txViewId);
 
         this.edtTextTitle.setText(extras.getString("title"));
         this.edtTextDescription.setText(extras.getString("description"));
         this.edtTextCreatedAt.setText(extras.getString("created_at"));
         this.edtTextUpdatedAt.setText(extras.getString("updated_at"));
         this.switchStocked.setChecked(extras.getBoolean("stocked"));
-        this.edtTextValue.setText(extras.getString("updated_at"));
+        this.edtTextValue.setText(String.valueOf(extras.getDouble("value")));
+        this.txViewId.setText(extras.getString("id"));
 
         Button btnSaveProduct = findViewById(R.id.btnSaveProduct);
         btnSaveProduct.setOnClickListener(v -> {
@@ -85,7 +89,11 @@ public class FormProductActivity extends AppCompatActivity {
             FirebaseAuth auth = ConfigFirebase.getAuth();
             JSONObject json = new JSONObject();
             json.put("user_id", Objects.requireNonNull(auth.getCurrentUser()).getUid());
-            json.put("id",  UUID.randomUUID().toString());
+            if(Objects.equals(this.action, "Create")) {
+                json.put("id", UUID.randomUUID().toString());
+            }else if(Objects.equals(this.action, "Edit")) {
+                json.put("id", this.txViewId.getText().toString());
+            }
             json.put("title", edtTextTitle.getText().toString());
             json.put("description", edtTextDescription.getText().toString());
             json.put("created_at", edtTextCreatedAt.getText().toString());
@@ -93,6 +101,26 @@ public class FormProductActivity extends AppCompatActivity {
             json.put("stocked", switchStocked.isChecked());
             json.put("value", Double.parseDouble(edtTextValue.getText().toString()));
             ProductEntity product = new ProductEntity(json);
+
+            if(Objects.equals(product.getTitle(), "") || product.getTitle() == null){
+                Toast.makeText(this, "Informe o título", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            if(Objects.equals(product.getDescription(), "") || product.getDescription() == null){
+                Toast.makeText(this, "Informe a descrição", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            if(!Objects.equals(product.getUpdated_at(), "") && product.getUpdated_at() != null && product.getStocked()){
+                Toast.makeText(this, "Se o produto possui data de saída, ele não pode estar em estoque", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            if (!product.getStocked() && (Objects.equals(product.getUpdated_at(), "") || product.getUpdated_at() == null)){
+                Toast.makeText(this, "Se o produto não está em estoque precisa ter uma data de saída.", Toast.LENGTH_LONG).show();
+                return;
+            }
 
             ProductRepository repository = new ProductRepository(new ProductDataSource());
             Boolean situation = null;
@@ -104,8 +132,12 @@ public class FormProductActivity extends AppCompatActivity {
                 Log.i("Edit", situation.toString());
             }
 
+            assert situation != null;
             if (situation.equals(true)){
-                Toast.makeText(this, (this.action.equals("Create") ? "Serviço cadastrado com sucesso" : "Serviço editado com sucesso"), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, (this.action.equals("Create") ? "Produto cadastrado com sucesso" : "Produto editado com sucesso"), Toast.LENGTH_LONG).show();
+                Intent result = new Intent();
+                result.putExtra("product", product.toJson().toString());
+                setResult(200, result);
                 finish();
             }else{
                 Toast.makeText(this, (this.action.equals("Create") ? "Erro ao cadastrar o serviço" : "Erro ao editar o serviço"), Toast.LENGTH_LONG).show();

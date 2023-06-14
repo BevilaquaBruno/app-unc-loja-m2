@@ -1,5 +1,9 @@
 package com.bevilaqua.aplicativo_unc_m2.data;
 
+import com.bevilaqua.aplicativo_unc_m2.app.core.ProductsAdapter;
+
+import java.util.ArrayList;
+
 /**
  * A generic class that holds a result success w/ data or an error exception.
  */

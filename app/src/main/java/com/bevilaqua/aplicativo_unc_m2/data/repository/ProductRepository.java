@@ -3,7 +3,10 @@ package com.bevilaqua.aplicativo_unc_m2.data.repository;
 import com.bevilaqua.aplicativo_unc_m2.data.Result;
 import com.bevilaqua.aplicativo_unc_m2.data.datasource.ProductDataSource;
 import com.bevilaqua.aplicativo_unc_m2.domain.entity.ProductEntity;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.Collections;
 import java.util.List;
 
 public class ProductRepository {
@@ -11,7 +14,7 @@ public class ProductRepository {
 
     private final ProductDataSource dataSource;
 
-    private List<ProductEntity> listProducts;
+    private List<ProductEntity> listProducts = Collections.emptyList();
 
     public ProductRepository(ProductDataSource dataSource) {
         this.dataSource = dataSource;
@@ -33,15 +36,11 @@ public class ProductRepository {
     }
 
     private List<ProductEntity> setListProducts(List<ProductEntity> list) {
-        listProducts.addAll(list);
-        return listProducts;
+        this.listProducts.addAll(list);
+        return this.listProducts;
     }
 
-    public Result<List<ProductEntity>> getProducts(String userId ){
-        Result<List<ProductEntity>> list = dataSource.getProducts(userId);
-        if( list instanceof Result.Success){
-            setListProducts(((Result.Success<List<ProductEntity>>) list).getData());
-        }
-        return list;
+    public Task<QuerySnapshot> getProducts(String userId ){
+        return dataSource.getProducts(userId);
     }
 }

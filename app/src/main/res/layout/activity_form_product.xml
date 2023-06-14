@@ -148,4 +148,12 @@
         app:layout_constraintHorizontal_bias="0.425"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <TextView
+        android:id="@+id/txViewId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        tools:layout_editor_absoluteX="175dp"
+        tools:layout_editor_absoluteY="41dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
