@@ -137,7 +137,7 @@ public class FormProductActivity extends AppCompatActivity {
                 Toast.makeText(this, (this.action.equals("Create") ? "Produto cadastrado com sucesso" : "Produto editado com sucesso"), Toast.LENGTH_LONG).show();
                 Intent result = new Intent();
                 result.putExtra("product", product.toJson().toString());
-                setResult(200, result);
+                setResult(-1, result);
                 finish();
             }else{
                 Toast.makeText(this, (this.action.equals("Create") ? "Erro ao cadastrar o serviço" : "Erro ao editar o serviço"), Toast.LENGTH_LONG).show();

@@ -41,6 +41,8 @@ import java.util.Objects;
 public class ListProductsActivity extends AppCompatActivity {
 
     private ArrayList<ProductEntity> listProducts;
+    public ListView listView;
+    public ArrayAdapter<ProductEntity> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,10 +71,10 @@ public class ListProductsActivity extends AppCompatActivity {
             }
         });
 
-        getProducts();
+        getProducts("Create");
     }
 
-    void getProducts() {
+    void getProducts(String action) {
         Log.i("Getting Products", "LOL");
         listProducts = new ArrayList<>();
 
@@ -103,18 +105,28 @@ public class ListProductsActivity extends AppCompatActivity {
             }
 
             setList(list);
-            createListView();
+            if(Objects.equals(action, "Update")){
+                this.adapter.clear();
+                this.adapter.addAll(this.listProducts);
+                this.adapter.notifyDataSetChanged();
+            }else{
+                createListView();
+            }
         });
     }
 
     private void createListView(){
-        ListView listView = findViewById(R.id.lv_products);
-        ArrayAdapter<ProductEntity> adapter = new ProductsAdapter(this, listProducts);
-        listView.setAdapter(adapter);
+        this.listView = findViewById(R.id.lv_products);
+        this.adapter = new ProductsAdapter(this, listProducts);
+        this.listView.setAdapter(adapter);
     }
 
     private void setList(List<ProductEntity> list) {
         this.listProducts = (ArrayList<ProductEntity>) list;
+    }
+
+    public void updateAdapter(){
+        getProducts("Update");
     }
 
     // You can do the assignment inside onAttach or onCreate, i.e, before the activity is displayed
@@ -126,8 +138,7 @@ public class ListProductsActivity extends AppCompatActivity {
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         // There are no request codes
                         Intent data = result.getData();
-
-                        getProducts();
+                        updateAdapter();
                     }
                 }
             });
