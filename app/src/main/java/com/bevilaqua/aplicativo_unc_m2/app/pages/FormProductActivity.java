@@ -79,9 +79,26 @@ public class FormProductActivity extends AppCompatActivity {
         this.txViewId.setText(extras.getString("id"));
 
         Button btnSaveProduct = findViewById(R.id.btnSaveProduct);
+        Button btnDeleteProduct = findViewById(R.id.btnDeleteProduct);
         btnSaveProduct.setOnClickListener(v -> {
             this.saveProduct();;
         });
+
+        btnDeleteProduct.setOnClickListener(v -> {
+            this.deleteProduct();
+        });
+    }
+
+    private void deleteProduct(){
+        ProductRepository productRepository = new ProductRepository(new ProductDataSource());
+        this.txViewId = findViewById(R.id.txViewId);
+        Boolean situation = null;
+        situation = ((Result.Success<Boolean>) productRepository.deleteProduct(txViewId.getText().toString())).getData();
+        if(situation.equals(true)){
+            Toast.makeText(this, "Produto deletado com sucesso!", Toast.LENGTH_LONG).show();
+            setResult(-1, null);
+            finish();
+        }
     }
 
     private void saveProduct() {

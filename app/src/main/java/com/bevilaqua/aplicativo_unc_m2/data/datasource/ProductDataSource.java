@@ -34,6 +34,14 @@ public class ProductDataSource {
         return new Result.Success(true);
     }
 
+    public Result<Boolean> deleteProduct(String productId){
+        db = ConfigFirebase.getDb();
+
+        db.collection("products").document(productId).delete();
+
+        return new Result.Success<>(true);
+    }
+
     public Result<Boolean> updateProduct(ProductEntity product) {
         db = ConfigFirebase.getDb();
 

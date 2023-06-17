@@ -31,6 +31,10 @@ public class ProductRepository {
         return dataSource.saveProduct(product);
     }
 
+    public Result<Boolean> deleteProduct(String productId){
+        return dataSource.deleteProduct(productId);
+    }
+
     public Result<Boolean> updateProduct(ProductEntity product){
         return dataSource.updateProduct(product);
     }
