@@ -13,4 +13,19 @@
     <string name="invalid_password">Senha deve ter mais de 5 caracteres</string>
     <string name="invalid_name">Nome inválido</string>
     <string name="login_failed">"Login failed"</string>
+
+    <!-- Product List -->
+    <string name="speakable_add_product">Adicionar produto</string>
+
+    <!-- Form product -->
+    <string name="form_app_bar_name_create">Cadastro de produto</string>
+    <string name="form_app_bar_name_edit">Editar produto</string>
+    <string name="tx_view_title">Título:</string>
+    <string name="tx_view_description">Descrição:</string>
+    <string name="tx_view_value">Valor:</string>
+    <string name="tx_view_created_at">Data de cadastro:</string>
+    <string name="tx_view_updated_at">Data de saída:</string>
+    <string name="tx_view_stocked">Em estoque</string>
+    <string name="btn_save">Salvar</string>
+    <string name="btn_delete">Excluir</string>
 </resources>
