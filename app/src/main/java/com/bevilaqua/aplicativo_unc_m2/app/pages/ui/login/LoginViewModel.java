@@ -1,5 +1,6 @@
 package com.bevilaqua.aplicativo_unc_m2.app.pages.ui.login;
 
+import android.util.Log;
 import android.util.Patterns;
 
 import androidx.lifecycle.LiveData;
@@ -11,9 +12,16 @@ import com.bevilaqua.aplicativo_unc_m2.data.Result;
 import com.bevilaqua.aplicativo_unc_m2.data.datasource.model.LoggedInUser;
 import com.bevilaqua.aplicativo_unc_m2.data.datasource.model.UserModel;
 import com.bevilaqua.aplicativo_unc_m2.data.repository.LoginRepository;
+import com.bevilaqua.aplicativo_unc_m2.data.sources.local.ConfigFirebase;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class LoginViewModel extends ViewModel {
 
@@ -40,11 +48,21 @@ public class LoginViewModel extends ViewModel {
         Map<String, Object> json = new HashMap<>();
         json.put("email", email);
         json.put("password", password);
-        Result<UserModel> result = loginRepository.login(json);
+        Task<AuthResult> result = loginRepository.login(json);
 
-        if (result instanceof Result.Success) {
-            UserModel data = ((Result.Success<UserModel>) result).getData();
-            loginResult.setValue(new LoginResult(new LoggedInUserView(data)));
+        if (result != null) {
+            result.addOnSuccessListener(task -> {
+                Log.d("SIGNSUCCESS", "signInWithEmail:success");
+                FirebaseAuth auth = ConfigFirebase.getAuth();
+                UserModel userModel =
+                        new UserModel(Objects.requireNonNull(Objects.requireNonNull(auth.getCurrentUser()).getUid()),
+                            auth.getCurrentUser().getDisplayName(),
+                            auth.getCurrentUser().getEmail()
+                        );
+                loginResult.setValue(new LoginResult(new LoggedInUserView(userModel)));
+            }).addOnFailureListener(task -> {
+                Log.w("SIGNFAILURE", Objects.requireNonNull(task.getCause()).toString());
+            });
         } else {
             loginResult.setValue(new LoginResult(R.string.login_failed));
         }
@@ -56,12 +74,22 @@ public class LoginViewModel extends ViewModel {
         json.put("email", email);
         json.put("password", password);
         json.put("name", name);
-        Result<UserModel> result = loginRepository.register(json);
+        Task<AuthResult> result = loginRepository.register(json);
 
 
-        if (result instanceof Result.Success) {
-            UserModel data = ((Result.Success<UserModel>) result).getData();
-            loginResult.setValue(new LoginResult(new LoggedInUserView(data)));
+        if (result != null) {
+            result.addOnSuccessListener(task -> {
+
+                Log.d("SIGNUPSUCCESS", "createUserWithEmail:success");
+                Objects.requireNonNull(Objects.requireNonNull(task.getUser()).updateProfile(
+                        new UserProfileChangeRequest.Builder().setDisplayName(
+                                name
+                        ).build()
+                ));
+                insertCurrenUser();
+            }).addOnFailureListener(task -> {
+                Log.w("SIGNUPFAILURE", "createUserWithEmail:failure", task.getCause());
+            });
         } else {
             loginResult.setValue(new LoginResult(R.string.login_failed));
         }

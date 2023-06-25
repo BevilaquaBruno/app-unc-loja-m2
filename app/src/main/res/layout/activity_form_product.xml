@@ -141,27 +141,25 @@
         android:id="@+id/btnSaveProduct"
         android:layout_width="149dp"
         android:layout_height="51dp"
-        android:layout_marginEnd="50dp"
-        android:layout_marginBottom="136dp"
+        android:layout_marginTop="64dp"
         android:backgroundTint="#4B9F54"
         android:text="@string/btn_save"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/switchStocked"
-        app:layout_constraintVertical_bias="0.914" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/switchStocked" />
 
     <Button
         android:id="@+id/btnDeleteProduct"
         android:layout_width="149dp"
         android:layout_height="51dp"
-        android:layout_marginBottom="128dp"
+        android:layout_marginBottom="60dp"
         android:backgroundTint="#B35252"
         android:text="@string/btn_delete"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btnSaveProduct"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtTextValue"
-        app:layout_constraintVertical_bias="0.836" />
+        app:layout_constraintTop_toBottomOf="@+id/btnSaveProduct"
+        app:layout_constraintVertical_bias="0.309" />
 
     <TextView
         android:id="@+id/txViewId"

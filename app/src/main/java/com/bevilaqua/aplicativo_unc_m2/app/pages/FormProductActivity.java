@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
@@ -52,16 +53,40 @@ public class FormProductActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_form_product);
 
+        // adiciona a action bar para poder voltar a tela
         ActionBar appBar = Objects.requireNonNull(getSupportActionBar());
-        Bundle extras = getIntent().getExtras();
-        this.action = extras.getString("action");
-        if(Objects.equals(this.action, "Create")) {
-            appBar.setTitle(R.string.form_app_bar_name_create);
-        }else if(Objects.equals(this.action, "Edit")){
-            appBar.setTitle(R.string.form_app_bar_name_edit);
-        }
         appBar.setDisplayHomeAsUpEnabled(true);
 
+        // instancia os botoes
+        Button btnSaveProduct = findViewById(R.id.btnSaveProduct);
+        Button btnDeleteProduct = findViewById(R.id.btnDeleteProduct);
+
+        // no click do salvar chama o método para gravar os dados
+        btnSaveProduct.setOnClickListener(v -> {
+            this.saveProduct();;
+        });
+
+        // pega o intent da tela, que são os dados que foram passados para o formulário
+        Bundle extras = getIntent().getExtras();
+        this.action = extras.getString("action");
+
+        // verifica se a ação passada é de criação ou edição
+        if(Objects.equals(this.action, "Create")) {
+            // se for uma criação seta a titleBar e o botão de excluir invisível
+            appBar.setTitle(R.string.form_app_bar_name_create);
+            btnDeleteProduct.setVisibility(View.INVISIBLE);
+        }else if(Objects.equals(this.action, "Edit")){
+            //se for uma edição seta a titleBar e o botão de excluir visivel
+            appBar.setTitle(R.string.form_app_bar_name_edit);
+            btnDeleteProduct.setVisibility(View.VISIBLE);
+
+            // seta o action do botão de deletar também
+            btnDeleteProduct.setOnClickListener(v -> {
+                this.deleteProduct();
+            });
+        }
+
+        // instancia todos os campos
         this.edtTextTitle = findViewById(R.id.edtTextTitle);
         this.edtTextDescription = findViewById(R.id.edtTextDescription);
         this.edtTextCreatedAt = findViewById(R.id.edtTextCreatedAt);
@@ -70,6 +95,7 @@ public class FormProductActivity extends AppCompatActivity {
         this.edtTextValue = findViewById(R.id.edtTextValue);
         this.txViewId = findViewById(R.id.txViewId);
 
+        // set o valor de todos os campos
         this.edtTextTitle.setText(extras.getString("title"));
         this.edtTextDescription.setText(extras.getString("description"));
         this.edtTextCreatedAt.setText(extras.getString("created_at"));
@@ -77,22 +103,15 @@ public class FormProductActivity extends AppCompatActivity {
         this.switchStocked.setChecked(extras.getBoolean("stocked"));
         this.edtTextValue.setText(String.valueOf(extras.getDouble("value")));
         this.txViewId.setText(extras.getString("id"));
-
-        Button btnSaveProduct = findViewById(R.id.btnSaveProduct);
-        Button btnDeleteProduct = findViewById(R.id.btnDeleteProduct);
-        btnSaveProduct.setOnClickListener(v -> {
-            this.saveProduct();;
-        });
-
-        btnDeleteProduct.setOnClickListener(v -> {
-            this.deleteProduct();
-        });
     }
 
     private void deleteProduct(){
+        //instancia o repository
         ProductRepository productRepository = new ProductRepository(new ProductDataSource());
+        //pega o id do txView invisivel
         this.txViewId = findViewById(R.id.txViewId);
         Boolean situation = null;
+        //deleta o produto
         situation = ((Result.Success<Boolean>) productRepository.deleteProduct(txViewId.getText().toString())).getData();
         if(situation.equals(true)){
             Toast.makeText(this, "Produto deletado com sucesso!", Toast.LENGTH_LONG).show();
@@ -103,14 +122,21 @@ public class FormProductActivity extends AppCompatActivity {
 
     private void saveProduct() {
         try {
+            // pega o usuário atual para pegar o id dele
             FirebaseAuth auth = ConfigFirebase.getAuth();
+            // cria um json do objeto que está sendo savo
             JSONObject json = new JSONObject();
+            // coloca o id do usuário
             json.put("user_id", Objects.requireNonNull(auth.getCurrentUser()).getUid());
+
+            // se for uma criação, cria um id random, se não, pega o id do txView
             if(Objects.equals(this.action, "Create")) {
                 json.put("id", UUID.randomUUID().toString());
             }else if(Objects.equals(this.action, "Edit")) {
                 json.put("id", this.txViewId.getText().toString());
             }
+
+            // adiciona os demais dados
             json.put("title", edtTextTitle.getText().toString());
             json.put("description", edtTextDescription.getText().toString());
             json.put("created_at", edtTextCreatedAt.getText().toString());
@@ -119,6 +145,7 @@ public class FormProductActivity extends AppCompatActivity {
             json.put("value", Double.parseDouble(edtTextValue.getText().toString()));
             ProductEntity product = new ProductEntity(json);
 
+            // validações
             if(Objects.equals(product.getTitle(), "") || product.getTitle() == null){
                 Toast.makeText(this, "Informe o título", Toast.LENGTH_LONG).show();
                 return;
@@ -139,24 +166,30 @@ public class FormProductActivity extends AppCompatActivity {
                 return;
             }
 
+            // instancia o repository
             ProductRepository repository = new ProductRepository(new ProductDataSource());
             Boolean situation = null;
+            // chama o método de acordo com a ação que for passada
             if(Objects.equals(this.action, "Create")){
+                // cria o produto
                 situation = ((Result.Success<Boolean>) repository.saveProduct(product)).getData();
                 Log.i("Create", situation.toString());
             }else if(Objects.equals(this.action, "Edit")) {
+                // edita o produto
                 situation = ((Result.Success<Boolean>) repository.updateProduct(product)).getData();
                 Log.i("Edit", situation.toString());
             }
 
             assert situation != null;
             if (situation.equals(true)){
+                // mostra a mensagem de acordo com a ação passada e retorna os dados com sucesso
                 Toast.makeText(this, (this.action.equals("Create") ? "Produto cadastrado com sucesso" : "Produto editado com sucesso"), Toast.LENGTH_LONG).show();
                 Intent result = new Intent();
                 result.putExtra("product", product.toJson().toString());
                 setResult(-1, result);
                 finish();
             }else{
+                //exibe algum erro na falha ao cadastrar
                 Toast.makeText(this, (this.action.equals("Create") ? "Erro ao cadastrar o serviço" : "Erro ao editar o serviço"), Toast.LENGTH_LONG).show();
             }
 

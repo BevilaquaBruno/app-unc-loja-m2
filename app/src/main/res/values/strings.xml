@@ -16,6 +16,7 @@
 
     <!-- Product List -->
     <string name="speakable_add_product">Adicionar produto</string>
+    <string name="speakable_logout">Logout</string>
 
     <!-- Form product -->
     <string name="form_app_bar_name_create">Cadastro de produto</string>

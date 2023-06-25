@@ -3,6 +3,8 @@ package com.bevilaqua.aplicativo_unc_m2.data.repository;
 import com.bevilaqua.aplicativo_unc_m2.data.Result;
 import com.bevilaqua.aplicativo_unc_m2.data.datasource.LoginDataSource;
 import com.bevilaqua.aplicativo_unc_m2.data.datasource.model.UserModel;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 
 import java.util.Map;
 
@@ -21,7 +23,7 @@ public class LoginRepository {
     private UserModel user = null;
 
     // private constructor : singleton access
-    private LoginRepository(LoginDataSource dataSource) {
+    public LoginRepository(LoginDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
@@ -47,22 +49,14 @@ public class LoginRepository {
         // @see https://developer.android.com/training/articles/keystore
     }
 
-    public Result<UserModel> login(Map<String, Object> json) {
+    public Task<AuthResult> login(Map<String, Object> json) {
         // handle login
-        Result<UserModel> result = dataSource.login(json);
-        if (result instanceof Result.Success) {
-            setUserModel(((Result.Success<UserModel>) result).getData());
-        }
-        return result;
+        return dataSource.login(json);
     }
 
-    public Result<UserModel> register(Map<String, Object> json) {
+    public Task<AuthResult> register(Map<String, Object> json) {
         // handle login
-        Result<UserModel> result = dataSource.createUser(json);
-        if (result instanceof Result.Success) {
-            setUserModel(((Result.Success<UserModel>) result).getData());
-        }
-        return result;
+        return dataSource.createUser(json);
     }
 
     public Result<UserModel> insertLoggedUser() {
